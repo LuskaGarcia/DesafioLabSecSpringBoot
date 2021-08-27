@@ -1,13 +1,34 @@
 package com.lucasgarcia.springdesafio;
 
+import java.util.Arrays;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
-public class DesafioLabSeCspringApplication {
+import com.lucasgarcia.springdesafio.domain.Authority;
+import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 
-	public static void main(String[] args) {
-		SpringApplication.run(DesafioLabSeCspringApplication.class, args);
-	}
+@SpringBootApplication
+public class DesafioLabSeCspringApplication implements CommandLineRunner {
+
+		Authority root = new Authority();
+		@Autowired // marcando o ponto de injeção
+		private CertificatesRepository certificatesRepository;
+		
+		public static void main(String[] args) {
+			SpringApplication.run(DesafioLabSeCspringApplication.class, args);
+		}
+
+		@Override
+		public void run(String... args) throws Exception {
+		
+			certificatesRepository.save(root.acRaiz);
+		
 
 }
+		
+
+}
+

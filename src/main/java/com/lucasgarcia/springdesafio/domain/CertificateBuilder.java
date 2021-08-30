@@ -1,6 +1,7 @@
 package com.lucasgarcia.springdesafio.domain;
 
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -23,7 +24,9 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 
-	public class CertificateBuilder{
+	public class CertificateBuilder implements Serializable{
+
+		private static final long serialVersionUID = 1L;
 	
 		private X500Name certIssuer;
 		private X500Name certSubject;
@@ -108,7 +111,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 			
 			    ContentSigner rootCertContentSigner = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(bcProvider).build(privKey); //criando a assinatura 
 		        X509v3CertificateBuilder rootCertBuilder = new JcaX509v3CertificateBuilder(certIssuer, serialNum, startDate, endDate, certSubject, pubKey);// cria o certificado com as caracteristicas
-
+		        
 		        // Add Extensions
 		        // A BasicConstraint to mark root certificate as CA certificate
 		        JcaX509ExtensionUtils rootCertExtUtils = new JcaX509ExtensionUtils(); // Crie uma classe de utilitário pré-configurada com uma calculadora de resumo SHA-1 com base na implementação padrão

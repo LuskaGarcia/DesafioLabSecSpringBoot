@@ -1,6 +1,7 @@
 package com.lucasgarcia.springdesafio.domain;
 
 import java.io.FileOutputStream;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.security.Security;
@@ -12,25 +13,23 @@ import java.util.Date;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-public class AuthorityBuilder {
+public class AuthorityBuilder implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 	
     private static final String BC_PROVIDER = "BC";
     //private static final String KEY_ALGORITHM = "RSA";
     private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
     
-    X500Name nameIssuerCert;
-    
-    public AuthorityBuilder() {
-    	
-    };
+    	public static Authority build(boolean isRoot, X500Name name) throws Exception {
+    		
+    		Authority authority = generateAuthority( isRoot, name);
 
-    public AuthorityBuilder(X500Name nameIssuerCert) {
-		super();
-		this.nameIssuerCert = nameIssuerCert;
-
-	}
+    		return authority;
+    	}
     
-	public static String GenerateCertificates() throws Exception{
+    
+	public static Authority generateAuthority(boolean isRoot, X500Name name) throws Exception{
         // Add the BouncyCastle Provider
         Security.addProvider(new BouncyCastleProvider());
         Keys chaves = new Keys(); // instancia a classe keys
@@ -48,12 +47,15 @@ public class AuthorityBuilder {
         // then a random serial number
         // then generate a certificate using the KeyPair
         BigInteger rootSerialNum = new BigInteger(Long.toString(new SecureRandom().nextLong())); //armazena o serialnumber que é um grande inteiro
-
         
         // Issued By and Issued To same for root certificate
-        X500Name rootCertIssuer = new X500Name("nameIssuerCert"); //o x500name é uma classe entidade que tem suporte aos atributos do x500
+        X500Name rootCertIssuer = name; //o x500name é uma classe entidade que tem suporte aos atributos do x500
         X500Name rootCertSubject = rootCertIssuer; // aqui define que é um AC auto assinado, pois diz que o issuer (emissor) é o mesmo que o subject (quem quer o certificado)
         CertificateBuilder rootCert = new CertificateBuilder(rootCertIssuer, rootCertSubject, rootSerialNum, startDate, endDate, chaves.publicKey, chaves.privateKey, SIGNATURE_ALGORITHM, BC_PROVIDER);
+        
+        return new Authority(name, rootCert, null);
+        
+    }
 //        
 //        writeCertToFileBase64Encoded(rootCert, "root-cert.cer");
 //        
@@ -108,7 +110,7 @@ public class AuthorityBuilder {
         
      // INSERT
         
-        String issuerPem = Base64.getEncoder().encodeToString(rootCert.getEncoded());
+        //String issuerPem = Base64.getEncoder().encodeToString(rootCert.getEncoded());
         //String subjectPem = Base64.getEncoder().encodeToString(issuedCert.getEncoded());
         
         //Certificates c1 = new Certificates(1, rootSerialNum, rootCertIssuer.toString(), rootCertSubject.toString(),issuerPem); // alt + shift + r  (renomeia)
@@ -119,9 +121,7 @@ public class AuthorityBuilder {
        // AuthorityBuilder chama o certificateBuilder 
        // Authority é o resultado do authoritybuilder
         
-        return issuerPem;
-        
-    }
+
 
 //    static void exportKeyPairToKeystoreFile(PrivateKey privateKey, Certificate rootCert, String alias, String fileName, String storeType, String storePass) throws Exception {
 //        KeyStore sslKeyStore = KeyStore.getInstance(storeType, BC_PROVIDER);

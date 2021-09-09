@@ -1,13 +1,14 @@
 package com.lucasgarcia.springdesafio.domain;
 
 
-import java.io.Serializable;
+
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -22,11 +23,17 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+
+import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 
 
-	public class CertificateBuilder implements Serializable{
-
-		private static final long serialVersionUID = 1L;
+	public class CertificateBuilder implements CommandLineRunner {
+		
+		
+		@Autowired
+		private CertificatesRepository certificatesRepository;
 	
 		private X500Name certIssuer;
 		private X500Name certSubject;
@@ -118,22 +125,26 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 		        rootCertBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true)); //marca a extensão com critica
 		        rootCertBuilder.addExtension(Extension.subjectKeyIdentifier, false, rootCertExtUtils.createSubjectKeyIdentifier(pubKey));
 
+
+		        
 		        // Create a cert holder and export to X509Certificate
 		        X509CertificateHolder rootCertHolder = rootCertBuilder.build(rootCertContentSigner); //recebe o criador de certificado com as caracteristicas e chama a variavel que é responsavel para assinar
 		        X509Certificate rootCert = new JcaX509CertificateConverter().setProvider(bcProvider).getCertificate(rootCertHolder); // recebe o certificado
 		        
-		        // Add Extensions
-		        // A BasicConstraint to mark root certificate as CA certificate
-		        JcaX509ExtensionUtils rootCertExtUtils1 = new JcaX509ExtensionUtils(); // Crie uma classe de utilitário pré-configurada com uma calculadora de resumo SHA-1 com base na implementação padrão
-		        rootCertBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true)); //marca a extensão com critica
-		        rootCertBuilder.addExtension(Extension.subjectKeyIdentifier, false, rootCertExtUtils1.createSubjectKeyIdentifier(pubKey));
+
 
 		        return rootCert;
 		}
-
-		public byte[] getEncoded() {
-			// TODO Auto-generated method stub
-			return null;
+		
+		@Override
+		public void run(String... args) throws Exception {
+			
+			
+			Certificates certificates = new Certificates(2, serialNum, certIssuer.toString(),certSubject.toString());
+			
+			certificatesRepository.saveAll(Arrays.asList(certificates));
+	
 		}
+		
 		
 	}

@@ -8,5 +8,6 @@ import com.lucasgarcia.springdesafio.domain.Authority;
 @Repository
 public interface AuthorityRepository extends JpaRepository<Authority, Integer>{
 	
+	
 }
 

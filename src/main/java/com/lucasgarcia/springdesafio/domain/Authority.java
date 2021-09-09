@@ -1,55 +1,77 @@
 package com.lucasgarcia.springdesafio.domain;
 
+
+
 import java.io.Serializable;
 
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.cert.X509CertificateHolder;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
+
+
+@Entity
 public class Authority implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
-	private X500Name name;
-	private CertificateBuilder authorityCert;
-	private X509CertificateHolder issuerCert;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	private String name;
+	@Column(length = 1000)
+	private String authorityCert; //fazer em formato de lista depois
+	private String issuerCert; //fazer em formato de lista depois transformar em uma string 
 	private boolean isRootAuthority;
 
-	public Authority(X500Name name, CertificateBuilder rootCert, X509CertificateHolder rootCert2) {
+	public Authority(Integer id, String name, String authorityCert, String issuerCert) {
+		this.id = id;
 		this.name = name;
-		this.authorityCert = rootCert;
-		this.issuerCert = rootCert2;
-		this.isRootAuthority = false;
+		this.authorityCert = authorityCert;
+		this.issuerCert = issuerCert;
+		this.isRootAuthority = false; 	
 
 	}
 
-	public Authority(X500Name name, CertificateBuilder authorityCert, X509CertificateHolder issuerCert, boolean rootAuthority) {
+	public Authority(Integer id, String name, String authorityCert, String issuerCert, boolean rootAuthority) {
+		this.id = id;
 		this.name = name;
 		this.authorityCert = authorityCert;
 		this.issuerCert = issuerCert;
 		this.isRootAuthority = rootAuthority;
 	}
 
-	public X500Name getName() {
-		return name;
+	public Integer getId() {
+		return id;
 	}
 
-	public void setName(X500Name name) {
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
+	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
 		this.name = name;
 	}
 
-	public CertificateBuilder getAuthorityCert() {
+	public String getAuthorityCert() {
 		return authorityCert;
 	}
 
-	public void setAuthorityCert(CertificateBuilder authorityCert) {
+	public void setAuthorityCert(String authorityCert) {
 		this.authorityCert = authorityCert;
 	}
 
-	public X509CertificateHolder getIssuerCert() {
+	public String getIssuerCert() {
 		return issuerCert;
 	}
 
-	public void setIssuerCert(X509CertificateHolder issuerCert) {
+	public void setIssuerCert(String issuerCert) {
 		this.issuerCert = issuerCert;
 	}
 
@@ -59,6 +81,12 @@ public class Authority implements Serializable{
 
 	public void setRootAuthority(boolean isRootAuthority) {
 		this.isRootAuthority = isRootAuthority;
+	}
+	
+	@Override
+	public String toString() {
+		return "Certificates [id=" + id + ", certificateAuthority=" + authorityCert + ", emissor=" + name + ", certificateIssuer="
+				+ issuerCert + "]";
 	}
 	
 	

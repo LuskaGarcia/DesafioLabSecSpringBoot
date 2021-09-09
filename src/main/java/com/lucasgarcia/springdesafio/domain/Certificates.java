@@ -4,6 +4,7 @@ package com.lucasgarcia.springdesafio.domain;
 
 	import java.io.Serializable;
 	import java.math.BigInteger;
+import java.util.Objects;
 
 import javax.persistence.Entity;
 	import javax.persistence.GeneratedValue;
@@ -21,7 +22,6 @@ import javax.persistence.Entity;
 		private BigInteger serialNumber;
 		private String emissor;
 		private String receptor;
-		private String pemEncoded;
 
 		
 		public Certificates() {
@@ -31,13 +31,13 @@ import javax.persistence.Entity;
 		
 		//apenas armazenamento de dados
 
-		public Certificates(Integer id, BigInteger serialNumber, String emissor, String receptor, String pemEncoded) {
+		public Certificates(Integer id, BigInteger serialNumber, String emissor, String receptor) {
 			super();
 			this.id = id;
 			this.serialNumber = serialNumber;
 			this.emissor = emissor;
 			this.receptor = receptor;
-			this.pemEncoded = pemEncoded;
+
 		}
 
 		public int getId() {
@@ -73,19 +73,28 @@ import javax.persistence.Entity;
 		}
 		
 		
-
-		public String getPemEncoded() {
-			return pemEncoded;
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(id);
 		}
 
-		public void setPemEncoded(String pemEncoded) {
-			this.pemEncoded = pemEncoded;
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Certificates other = (Certificates) obj;
+			return Objects.equals(id, other.id);
 		}
 
 		@Override
 		public String toString() {
 			return "Certificates [id=" + id + ", serialNumber=" + serialNumber + ", emissor=" + emissor + ", receptor="
-					+ receptor + ", pemEncoded = " + pemEncoded + "]";
+					+ receptor + "]";
 		}
 
 

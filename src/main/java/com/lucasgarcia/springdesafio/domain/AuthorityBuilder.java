@@ -21,7 +21,7 @@ public class AuthorityBuilder implements Serializable{
     //private static final String KEY_ALGORITHM = "RSA";
     private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
     
-    	public static Authority build(boolean isRoot, X500Name name) throws Exception {
+    	public static Authority build(boolean isRoot, String name) throws Exception {
     		
     		Authority authority = generateAuthority( isRoot, name);
 
@@ -29,7 +29,7 @@ public class AuthorityBuilder implements Serializable{
     	}
     
     
-	public static Authority generateAuthority(boolean isRoot, X500Name name) throws Exception{
+	public static Authority generateAuthority(boolean isRoot, String name) throws Exception{
         // Add the BouncyCastle Provider
         Security.addProvider(new BouncyCastleProvider());
         Keys chaves = new Keys(); // instancia a classe keys
@@ -49,19 +49,43 @@ public class AuthorityBuilder implements Serializable{
         BigInteger rootSerialNum = new BigInteger(Long.toString(new SecureRandom().nextLong())); //armazena o serialnumber que é um grande inteiro
         
         // Issued By and Issued To same for root certificate
-        X500Name rootCertIssuer = name; //o x500name é uma classe entidade que tem suporte aos atributos do x500
+        X500Name rootCertIssuer = new X500Name(name); //o x500name é uma classe entidade que tem suporte aos atributos do x500
         X500Name rootCertSubject = rootCertIssuer; // aqui define que é um AC auto assinado, pois diz que o issuer (emissor) é o mesmo que o subject (quem quer o certificado)
         CertificateBuilder rootCert = new CertificateBuilder(rootCertIssuer, rootCertSubject, rootSerialNum, startDate, endDate, chaves.publicKey, chaves.privateKey, SIGNATURE_ALGORITHM, BC_PROVIDER);
+        String issuerPem = Base64.getEncoder().encodeToString(rootCert.X500Certificate().getEncoded());
         
-        return new Authority(name, rootCert, null);
+       // exportKeyPairToKeystoreFile(chaves.privateKey, rootCert, "root-cert", "root-cert.pfx", "PKCS12", "pass");
+        writeCertToFileBase64Encoded(rootCert, "root-cert.cer");
+        
+        
+        return new Authority(null,name, issuerPem, null);
         
     }
+	
+//    static void exportKeyPairToKeystoreFile(PrivateKey privateKey, Certificate rootCert, String alias, String fileName, String storeType, String storePass) throws Exception {
+//        KeyStore sslKeyStore = KeyStore.getInstance(storeType, BC_PROVIDER);
+//       sslKeyStore.load(null, null);
+//       sslKeyStore.setKeyEntry(alias, privateKey,null, new Certificate[]{rootCert});
+//       FileOutputStream keyStoreOs = new FileOutputStream(fileName);
+//       sslKeyStore.store(keyStoreOs, storePass.toCharArray());
+//    }
+	
+    static Certificate writeCertToFileBase64Encoded(CertificateBuilder rootCert, String fileName) throws Exception {
+        FileOutputStream certificateOut = new FileOutputStream(fileName);
+        certificateOut.write("-----BEGIN CERTIFICATE-----".getBytes());
+        certificateOut.write(Base64.getEncoder().encode(rootCert.X500Certificate().getEncoded()));
+        certificateOut.write("-----END CERTIFICATE-----".getBytes());
+        certificateOut.close();
+		return null;
+    }
+}
+	
 //        
 //        writeCertToFileBase64Encoded(rootCert, "root-cert.cer");
 //        
         //Até aqui é tudo direcionado a AC raiz autoassinado
         
-//        exportKeyPairToKeystoreFile(chaves.privateKey, rootCert, "root-cert", "root-cert.pfx", "PKCS12", "pass");
+
 
         // Generate a new KeyPair and sign it using the Root Cert Private Key
         // by generating a CSR (Certificate Signing Request)
@@ -110,7 +134,7 @@ public class AuthorityBuilder implements Serializable{
         
      // INSERT
         
-        //String issuerPem = Base64.getEncoder().encodeToString(rootCert.getEncoded());
+        
         //String subjectPem = Base64.getEncoder().encodeToString(issuedCert.getEncoded());
         
         //Certificates c1 = new Certificates(1, rootSerialNum, rootCertIssuer.toString(), rootCertSubject.toString(),issuerPem); // alt + shift + r  (renomeia)
@@ -123,20 +147,5 @@ public class AuthorityBuilder implements Serializable{
         
 
 
-//    static void exportKeyPairToKeystoreFile(PrivateKey privateKey, Certificate rootCert, String alias, String fileName, String storeType, String storePass) throws Exception {
-//        KeyStore sslKeyStore = KeyStore.getInstance(storeType, BC_PROVIDER);
-//        sslKeyStore.load(null, null);
-//        sslKeyStore.setKeyEntry(alias, privateKey,null, new Certificate[]{rootCert});
-//        FileOutputStream keyStoreOs = new FileOutputStream(fileName);
-//        sslKeyStore.store(keyStoreOs, storePass.toCharArray());
-//    }
 
-    static Certificate writeCertToFileBase64Encoded(CertificateBuilder rootCert, String fileName) throws Exception {
-        FileOutputStream certificateOut = new FileOutputStream(fileName);
-        certificateOut.write("-----BEGIN CERTIFICATE-----".getBytes());
-        certificateOut.write(Base64.getEncoder().encode(rootCert.getEncoded()));
-        certificateOut.write("-----END CERTIFICATE-----".getBytes());
-        certificateOut.close();
-		return null;
-    }
-}
+

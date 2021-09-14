@@ -35,7 +35,7 @@ public class AuthorityBuilder implements Serializable{
 	public static Authority generateAuthority(boolean isRoot, String name, Authority issuer,CertificatesRepository certificatesRepository, KeysRepository keysRepository) throws Exception{
         // Add the BouncyCastle Provider
         Security.addProvider(new BouncyCastleProvider());
-        KeyBuilder chaves = new KeyBuilder(keysRepository); // instancia a classe keys
+        KeysBuilder chaves = new KeysBuilder(keysRepository); // instancia a classe keys
         
         X500Name rootCertIssuer,rootCertSubject, issuedCertSubject;
         BigInteger rootSerialNum,issuedSerialNum;
@@ -64,7 +64,7 @@ public class AuthorityBuilder implements Serializable{
              
             // exportKeyPairToKeystoreFile(chaves.privateKey, rootCert, "root-cert", "root-cert.pfx", "PKCS12", "pass");
              writeCertToFileBase64Encoded(rootCert, "root-cert.cer");
-             return new Authority(null,rootCertIssuer.toString(), issuerPem, rootCertSubject.toString(), isRoot);
+             return new Authority(null,rootCertSubject.toString(),rootCertIssuer.toString(),isRoot);
         }else {
 
          // First step is to create a root certificate
@@ -81,7 +81,7 @@ public class AuthorityBuilder implements Serializable{
         // exportKeyPairToKeystoreFile(chaves.privateKey, rootCert, "root-cert", "root-cert.pfx", "PKCS12", "pass");
          writeCertToFileBase64Encoded(issuedCert, "issued-cert.cer");
         	
-         return new Authority(null,issuer.getName().toString(), issuedPem, issuedCertSubject.toString(), isRoot);
+         return new Authority(null,issuedCertSubject.toString(),issuer.getName().toString(), isRoot);
         }
         
        

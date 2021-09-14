@@ -12,6 +12,7 @@ import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -171,12 +172,12 @@ import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 	  
 	                       X509CertificateHolder issuedCertHolder = issuedCertBuilder.build(csrContentSigner);
 	                       X509Certificate issuedCert  = new JcaX509CertificateConverter().setProvider(bcProvider).getCertificate(issuedCertHolder);
-	              
+	                       String issuedCertificatePem = Base64.getEncoder().encodeToString(issuedCert.getEncoded());
 	                      // Verify the issued cert signature against the root (issuer) cert
 	                       issuedCert.verify(pubKey, bcProvider);
 	                       
 	                       
-	       				Certificate certificates = new Certificate(2, serialNum.longValue(), certIssuer.toString(),certSubject.toString());
+	       				Certificate certificates = new Certificate(1, issuedCertificatePem);
 	    				
 	    				this.certificatesRepository.saveAll(Arrays.asList(certificates));
 	                       
@@ -198,13 +199,14 @@ import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 		        
 		        // Create a cert holder and export to X509Certificate
 		        X509CertificateHolder rootCertHolder = rootCertBuilder.build(rootCertContentSigner); //recebe o criador de certificado com as caracteristicas e chama a variavel que é responsavel para assinar
-		        X509Certificate certificate = new JcaX509CertificateConverter().setProvider(bcProvider).getCertificate(rootCertHolder); // recebe o certificado
+		        X509Certificate rootCertificate = new JcaX509CertificateConverter().setProvider(bcProvider).getCertificate(rootCertHolder); // recebe o certificado
+		        String rootCertificatePem = Base64.getEncoder().encodeToString(rootCertificate.getEncoded());
 		        
-   				Certificate certificates = new Certificate(2, serialNum.longValue(), certIssuer.toString(),certSubject.toString());
+   				Certificate certificates = new Certificate(2,rootCertificatePem);
 				
 				this.certificatesRepository.saveAll(Arrays.asList(certificates));
 		        
-		        return certificate;
+		        return rootCertificate;
 		        
 		        
 

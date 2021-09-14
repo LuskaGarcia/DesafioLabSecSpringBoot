@@ -3,14 +3,13 @@ package com.lucasgarcia.springdesafio.domain;
 
 
 	import java.io.Serializable;
-	
-	import java.util.Objects;
+import java.util.Objects;
 
-	import javax.persistence.Column;
-	import javax.persistence.Entity;
-	import javax.persistence.GeneratedValue;
-	import javax.persistence.GenerationType;
-	import javax.persistence.Id;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 
 	@Entity
@@ -22,9 +21,8 @@ package com.lucasgarcia.springdesafio.domain;
 		@GeneratedValue(strategy = GenerationType.IDENTITY)
 		private Integer id;
 		@Column(length = 1000)
-		private java.lang.Long serialNumber;
-		private String emissor;
-		private String receptor;
+		private String certificate;
+
 
 		
 		public Certificate() {
@@ -34,12 +32,11 @@ package com.lucasgarcia.springdesafio.domain;
 		
 		//apenas armazenamento de dados
 
-		public Certificate(Integer id, java.lang.Long serialNumber, String emissor, String receptor) {
+		public Certificate(Integer id, String certificate) {
 			super();
 			this.id = id;
-			this.serialNumber = serialNumber;
-			this.emissor = emissor;
-			this.receptor = receptor;
+			this.certificate = certificate;
+
 			//armazenar APENAS certificado
 			// pra passar pra outra tabela, apenas o referencial id
 
@@ -51,33 +48,18 @@ package com.lucasgarcia.springdesafio.domain;
 
 		public void setId(Integer id) {
 			this.id = id;
-		}
-
-		public java.lang.Long getSerialNumber() {
-			return serialNumber;
-		}
-		public void setSerialNumber(java.lang.Long serialNumber) {
-			this.serialNumber = serialNumber;
-		}
-
-		public String getEmissor() {
-			return emissor;
-		}
-
-		public void setEmissor(String emissor) {
-			this.emissor = emissor;
-		}
-
-		public String getReceptor() {
-			return receptor;
-		}
-
-		public void setReceptor(String receptor) {
-			this.receptor = receptor;
-		}
+		}	
 		
 		
 		
+		public String getCertificate() {
+			return certificate;
+		}
+
+		public void setCertificate(String certificate) {
+			this.certificate = certificate;
+		}
+
 		@Override
 		public int hashCode() {
 			return Objects.hash(id);
@@ -93,12 +75,6 @@ package com.lucasgarcia.springdesafio.domain;
 				return false;
 			Certificate other = (Certificate) obj;
 			return Objects.equals(id, other.id);
-		}
-
-		@Override
-		public String toString() {
-			return "Certificates [id=" + id + ", serialNumber=" + serialNumber + ", emissor=" + emissor + ", receptor="
-					+ receptor + "]";
 		}
 
 

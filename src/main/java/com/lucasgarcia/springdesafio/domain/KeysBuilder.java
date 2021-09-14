@@ -13,7 +13,7 @@ import java.util.Properties;
 import com.lucasgarcia.springdesafio.DesafioLabSeCspringApplication;
 import com.lucasgarcia.springdesafio.domain.repositories.KeysRepository;
 
-public class KeyBuilder {
+public class KeysBuilder {
 	
 	private Integer id;
 	private PublicKey publicKey;
@@ -31,7 +31,7 @@ public class KeyBuilder {
 
 	} 
     
-    public KeyBuilder(KeysRepository keysRepository) throws NoSuchAlgorithmException, IOException {
+    public KeysBuilder(KeysRepository keysRepository) throws NoSuchAlgorithmException, IOException {
     	
     	this.keysRepository = keysRepository;
     	

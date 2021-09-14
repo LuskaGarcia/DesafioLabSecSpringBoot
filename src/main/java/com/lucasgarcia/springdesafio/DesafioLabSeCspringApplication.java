@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.lucasgarcia.springdesafio.domain.Authority;
 import com.lucasgarcia.springdesafio.domain.AuthorityBuilder;
-import com.lucasgarcia.springdesafio.domain.Certificate;
 import com.lucasgarcia.springdesafio.domain.repositories.AuthorityRepository;
 import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 import com.lucasgarcia.springdesafio.domain.repositories.KeysRepository;
@@ -46,9 +45,6 @@ public class DesafioLabSeCspringApplication implements CommandLineRunner {
 			
 			Authority intermediateAuthority = AuthorityBuilder.build(false, "CN=subject-cert", rootAuthority, certificatesRepository, keysRepository);			
 			authorityRepository.saveAll(Arrays.asList(intermediateAuthority));	
-			
-			Certificate certificates = new Certificate(1, java.lang.Long.valueOf(10), "Abcd", "ABCDD");
-			certificatesRepository.saveAll(Arrays.asList(certificates));
 			
 	
 		}

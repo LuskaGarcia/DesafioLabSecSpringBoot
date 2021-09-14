@@ -20,10 +20,9 @@ public class Authority implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String name;
 	@Column(length = 1000)
-	private String authorityCert; //fazer em formato de lista depois
-	private String issuerCert; //fazer em formato de lista depois transformar em uma string 
+	private String name;
+	private String issuerCert; 
 	private boolean isRootAuthority;
 	
 	public Authority () {
@@ -31,19 +30,17 @@ public class Authority implements Serializable{
 		
 	}
 
-	public Authority(Integer id, String name, String authorityCert, String issuerCert) {
+	public Authority(Integer id, String name, String issuerCert) {
 		this.id = id;
 		this.name = name;
-		this.authorityCert = authorityCert;
 		this.issuerCert = issuerCert;
 		this.isRootAuthority = false;
 
 	}
 	
-	public Authority(Integer id, String name, String authorityCert, String issuerCert, boolean rootAuthority) {
+	public Authority(Integer id, String name,String issuerCert, boolean rootAuthority) {
 		this.id = id;
 		this.name = name;
-		this.authorityCert = authorityCert;
 		this.issuerCert = issuerCert;
 		this.isRootAuthority = rootAuthority;
 	}
@@ -63,15 +60,6 @@ public class Authority implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public String getAuthorityCert() {
-		return authorityCert;
-	}
-
-	public void setAuthorityCert(String authorityCert) {
-		this.authorityCert = authorityCert;
-	}
-
 	public String getIssuerCert() {
 		return issuerCert;
 	}
@@ -88,11 +76,6 @@ public class Authority implements Serializable{
 		this.isRootAuthority = isRootAuthority;
 	}
 	
-	@Override
-	public String toString() {
-		return "Certificates [id=" + id + ", certificateAuthority=" + authorityCert + ", emissor=" + name + ", certificateIssuer="
-				+ issuerCert + "]";
-	}
-	
+
 	
 }

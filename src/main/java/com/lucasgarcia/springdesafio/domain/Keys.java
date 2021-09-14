@@ -1,56 +1,66 @@
 package com.lucasgarcia.springdesafio.domain;
 
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Properties;
+import java.io.Serializable;
 
-import com.lucasgarcia.springdesafio.DesafioLabSeCspringApplication;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-
-
-public class Keys {
+@Entity
+public class Keys implements Serializable{ 
+	private static final long serialVersionUID = 1L;
 	
-	public PublicKey publicKey;
-	public PrivateKey privateKey; 
-	public PublicKey publicKey2;
-	public PrivateKey privateKey2;
-
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	@Column(length = 10000)
+	private byte[] publicKey;
+	@Column(length = 10000)
+	private byte[] privateKey;
 	
-    public static Properties getProp() throws IOException {
-		Properties props = new Properties(); // Instancia a classes properties na variavel props
-		InputStream file = DesafioLabSeCspringApplication.class.getResourceAsStream("/dados.properties"); // adiciona o arquivo a variavel
-		props.load(file); //carrega o arquivo de propriedades na variavel
-		return props;
-
+	
+	public Keys(Integer id, byte[] publicKey, byte[] privateKey) {
+		super();
+		this.id = id;
+		this.publicKey = publicKey;
+		this.privateKey = privateKey;
 	}
 
-	    public Keys() throws NoSuchAlgorithmException, IOException {
-	    	String bits;
-	    	
-	    	Properties prop = getProp(); //instanciando o props
-	    	bits = prop.getProperty("prop.choice"); // cria a variavel e chama a propriedade do arquivo
-	    	
-	    	
-	    	KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");//gera as chaves em RSA
-	        generator.initialize(Integer.parseInt(bits, 10));// inicializa em 1024bits e converse a string em int
-	        
-	        
-	        KeyPair keyPair = generator.generateKeyPair();//gera o par de chaves e coloca no keypair
-	        this.publicKey = keyPair.getPublic();//extraio 
-	        this.privateKey = keyPair.getPrivate();//extraio
-	        
-	        KeyPair keyPair2= generator.generateKeyPair();
-	        this.publicKey2 = keyPair2.getPublic();
-	        this.privateKey2 = keyPair2.getPrivate();
-	        
-	        //tabela com referencia
-	    }
+
+	public Integer getId() {
+		return id;
+	}
+
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+
+	public byte[] getPublicKey() {
+		return publicKey;
+	}
+
+
+	public void setPublicKey(byte[] publicKey) {
+		this.publicKey = publicKey;
+	}
+
+
+	public byte[] getPrivateKey() {
+		return privateKey;
+	}
+
+
+	public void setPrivateKey(byte[] privateKey) {
+		this.privateKey = privateKey;
+	} 
+
+
+
 
 
 }

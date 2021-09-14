@@ -9,9 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.lucasgarcia.springdesafio.domain.Authority;
 import com.lucasgarcia.springdesafio.domain.AuthorityBuilder;
-import com.lucasgarcia.springdesafio.domain.Certificates;
+import com.lucasgarcia.springdesafio.domain.Certificate;
 import com.lucasgarcia.springdesafio.domain.repositories.AuthorityRepository;
 import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
+import com.lucasgarcia.springdesafio.domain.repositories.KeysRepository;
 
 
 @SpringBootApplication
@@ -23,6 +24,9 @@ public class DesafioLabSeCspringApplication implements CommandLineRunner {
 		
 		@Autowired
 		private  CertificatesRepository certificatesRepository;
+		
+		@Autowired
+		private  KeysRepository keysRepository;
 		
 		
 		public static void main(String[] args) {
@@ -37,13 +41,13 @@ public class DesafioLabSeCspringApplication implements CommandLineRunner {
 		   //CertificateBuilder builder = new CertificateBuilder(certificatesRepository);
 			
 			
-			Authority rootAuthority = AuthorityBuilder.build(true, "CN=root-cert",null,certificatesRepository);			
+			Authority rootAuthority = AuthorityBuilder.build(true, "CN=root-cert",null,certificatesRepository, keysRepository);			
 			authorityRepository.saveAll(Arrays.asList(rootAuthority));		
 			
-			Authority intermediateAuthority = AuthorityBuilder.build(false, "CN=subject-cert", rootAuthority, certificatesRepository);			
+			Authority intermediateAuthority = AuthorityBuilder.build(false, "CN=subject-cert", rootAuthority, certificatesRepository, keysRepository);			
 			authorityRepository.saveAll(Arrays.asList(intermediateAuthority));	
 			
-			Certificates certificates = new Certificates(1, java.lang.Long.valueOf(10), "Abcd", "ABCDD");
+			Certificate certificates = new Certificate(1, java.lang.Long.valueOf(10), "Abcd", "ABCDD");
 			certificatesRepository.saveAll(Arrays.asList(certificates));
 			
 	

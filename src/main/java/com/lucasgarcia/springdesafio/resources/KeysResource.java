@@ -7,21 +7,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lucasgarcia.springdesafio.domain.Certificate;
-import com.lucasgarcia.springdesafio.services.CertificatesService;
+import com.lucasgarcia.springdesafio.domain.Keys;
+import com.lucasgarcia.springdesafio.services.KeysService;
 
 import javassist.tools.rmi.ObjectNotFoundException;
 
 @RestController
-@RequestMapping(value="/certificados")
-public class CertificatesResource {
+@RequestMapping(value="/keys")
+public class KeysResource {
 	
 	@Autowired
-	private CertificatesService service;
+	private KeysService service;
 
 	@RequestMapping(value="/{id}",method=RequestMethod.GET)
 	public ResponseEntity<?> find(@PathVariable Integer id) throws ObjectNotFoundException {
-		Certificate obj = service.find(id);
+		Keys obj = service.find(id);
 		return ResponseEntity.ok().body(obj);
 	}
 	

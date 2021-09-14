@@ -14,7 +14,7 @@ package com.lucasgarcia.springdesafio.domain;
 
 
 	@Entity
-	public class Certificates implements Serializable{ 
+	public class Certificate implements Serializable{ 
 		private static final long serialVersionUID = 1L;
 		
 		
@@ -27,14 +27,14 @@ package com.lucasgarcia.springdesafio.domain;
 		private String receptor;
 
 		
-		public Certificates() {
+		public Certificate() {
 			
 			
 		}
 		
 		//apenas armazenamento de dados
 
-		public Certificates(Integer id, java.lang.Long serialNumber, String emissor, String receptor) {
+		public Certificate(Integer id, java.lang.Long serialNumber, String emissor, String receptor) {
 			super();
 			this.id = id;
 			this.serialNumber = serialNumber;
@@ -91,7 +91,7 @@ package com.lucasgarcia.springdesafio.domain;
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			Certificates other = (Certificates) obj;
+			Certificate other = (Certificate) obj;
 			return Objects.equals(id, other.id);
 		}
 

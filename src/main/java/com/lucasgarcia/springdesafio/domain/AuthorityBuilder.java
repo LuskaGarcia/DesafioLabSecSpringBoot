@@ -14,6 +14,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
+import com.lucasgarcia.springdesafio.domain.repositories.KeysRepository;
 
 public class AuthorityBuilder implements Serializable{
 
@@ -23,18 +24,18 @@ public class AuthorityBuilder implements Serializable{
     //private static final String KEY_ALGORITHM = "RSA";
     private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
     
-    	public static Authority build(boolean isRoot, String name, Authority issuer, CertificatesRepository certificatesRepository) throws Exception {
+    	public static Authority build(boolean isRoot, String name, Authority issuer, CertificatesRepository certificatesRepository, KeysRepository keysRepository) throws Exception {
     		
-    		Authority authority = generateAuthority( isRoot, name,issuer,certificatesRepository);
+    		Authority authority = generateAuthority( isRoot, name,issuer,certificatesRepository, keysRepository);
 
     		return authority;
     	}
     
     
-	public static Authority generateAuthority(boolean isRoot, String name, Authority issuer,CertificatesRepository certificatesRepository) throws Exception{
+	public static Authority generateAuthority(boolean isRoot, String name, Authority issuer,CertificatesRepository certificatesRepository, KeysRepository keysRepository) throws Exception{
         // Add the BouncyCastle Provider
         Security.addProvider(new BouncyCastleProvider());
-        Keys chaves = new Keys(); // instancia a classe keys
+        KeyBuilder chaves = new KeyBuilder(keysRepository); // instancia a classe keys
         
         X500Name rootCertIssuer,rootCertSubject, issuedCertSubject;
         BigInteger rootSerialNum,issuedSerialNum;
@@ -58,7 +59,7 @@ public class AuthorityBuilder implements Serializable{
              // Issued By and Issued To same for root certificate
              rootCertIssuer = new X500Name(name); //o x500name é uma classe entidade que tem suporte aos atributos do x500
              rootCertSubject = rootCertIssuer; // aqui define que é um AC auto assinado, pois diz que o issuer (emissor) é o mesmo que o subject (quem quer o certificado)
-             CertificateBuilder rootCert = new CertificateBuilder(rootCertIssuer, rootCertSubject, rootSerialNum, startDate, endDate, chaves.publicKey, chaves.privateKey,null,null, SIGNATURE_ALGORITHM, BC_PROVIDER,certificatesRepository,isRoot);
+             CertificateBuilder rootCert = new CertificateBuilder(rootCertIssuer, rootCertSubject, rootSerialNum, startDate, endDate, chaves.getPublicKey(), chaves.getPrivateKey(),null,null, SIGNATURE_ALGORITHM, BC_PROVIDER,certificatesRepository,isRoot);
              issuerPem = Base64.getEncoder().encodeToString(rootCert.X500Certificate().getEncoded());
              
             // exportKeyPairToKeystoreFile(chaves.privateKey, rootCert, "root-cert", "root-cert.pfx", "PKCS12", "pass");
@@ -74,16 +75,15 @@ public class AuthorityBuilder implements Serializable{
          
          // Issued By and Issued To same for root certificate
          issuedCertSubject = new X500Name(name); //o x500name é uma classe entidade que tem suporte aos atributos do x500
-         CertificateBuilder issuedCert = new CertificateBuilder(issuedCertSubject,new X500Name(issuer.getName()) , issuedSerialNum, startDate, endDate, chaves.publicKey, chaves.privateKey, chaves.publicKey2, chaves.privateKey2, SIGNATURE_ALGORITHM, BC_PROVIDER, certificatesRepository, isRoot);
+         CertificateBuilder issuedCert = new CertificateBuilder(issuedCertSubject,new X500Name(issuer.getName()) , issuedSerialNum, startDate, endDate, chaves.getPublicKey(), chaves.getPrivateKey(), chaves.getPublicKey2(), chaves.getPrivateKey2(), SIGNATURE_ALGORITHM, BC_PROVIDER, certificatesRepository, isRoot);
          issuedPem = Base64.getEncoder().encodeToString(issuedCert.X500Certificate().getEncoded());
          
         // exportKeyPairToKeystoreFile(chaves.privateKey, rootCert, "root-cert", "root-cert.pfx", "PKCS12", "pass");
-         writeCertToFileBase64Encoded(issuedCert, "root-cert.cer");
+         writeCertToFileBase64Encoded(issuedCert, "issued-cert.cer");
         	
          return new Authority(null,issuer.getName().toString(), issuedPem, issuedCertSubject.toString(), isRoot);
         }
         
-        // Setup start date to yesterday and end date for 1 year validity
        
         
         

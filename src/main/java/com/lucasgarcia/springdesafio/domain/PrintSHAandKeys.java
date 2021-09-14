@@ -31,12 +31,5 @@ public class PrintSHAandKeys {
 	System.out.println("SHA-256: " + output);
 
 	//byte messageDigest[] = algorithm.digest(doc.getBytes("UTF-8"));
-
-
-	Keys chaves = new Keys();//instanciando a classe
-	
-	System.out.println(chaves.privateKey.toString());
-	System.out.println(" \n");
-	System.out.println(chaves.publicKey.toString());
 }
 }

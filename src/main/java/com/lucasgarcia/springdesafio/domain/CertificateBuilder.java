@@ -176,7 +176,7 @@ import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 	                       issuedCert.verify(pubKey, bcProvider);
 	                       
 	                       
-	       				Certificates certificates = new Certificates(2, serialNum.longValue(), certIssuer.toString(),certSubject.toString());
+	       				Certificate certificates = new Certificate(2, serialNum.longValue(), certIssuer.toString(),certSubject.toString());
 	    				
 	    				this.certificatesRepository.saveAll(Arrays.asList(certificates));
 	                       
@@ -200,7 +200,7 @@ import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 		        X509CertificateHolder rootCertHolder = rootCertBuilder.build(rootCertContentSigner); //recebe o criador de certificado com as caracteristicas e chama a variavel que é responsavel para assinar
 		        X509Certificate certificate = new JcaX509CertificateConverter().setProvider(bcProvider).getCertificate(rootCertHolder); // recebe o certificado
 		        
-   				Certificates certificates = new Certificates(2, serialNum.longValue(), certIssuer.toString(),certSubject.toString());
+   				Certificate certificates = new Certificate(2, serialNum.longValue(), certIssuer.toString(),certSubject.toString());
 				
 				this.certificatesRepository.saveAll(Arrays.asList(certificates));
 		        

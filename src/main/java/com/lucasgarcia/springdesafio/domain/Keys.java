@@ -39,13 +39,17 @@ public class Keys {
 	    	
 	    	KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");//gera as chaves em RSA
 	        generator.initialize(Integer.parseInt(bits, 10));// inicializa em 1024bits e converse a string em int
-	        KeyPair keyPair = generator.generateKeyPair();//gera o par de chaves e coloca no keypair
 	        
+	        
+	        KeyPair keyPair = generator.generateKeyPair();//gera o par de chaves e coloca no keypair
 	        this.publicKey = keyPair.getPublic();//extraio 
 	        this.privateKey = keyPair.getPrivate();//extraio
+	        
 	        KeyPair keyPair2= generator.generateKeyPair();
 	        this.publicKey2 = keyPair2.getPublic();
 	        this.privateKey2 = keyPair2.getPrivate();
+	        
+	        //tabela com referencia
 	    }
 
 

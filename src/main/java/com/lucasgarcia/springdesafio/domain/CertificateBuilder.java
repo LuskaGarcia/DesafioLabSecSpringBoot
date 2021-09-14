@@ -3,13 +3,18 @@ package com.lucasgarcia.springdesafio.domain;
 
 
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
+
+import javax.persistence.Column;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;
@@ -23,27 +28,30 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 
 import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 
 
-	public class CertificateBuilder implements CommandLineRunner {
+	public class CertificateBuilder {
 		
-		
-		@Autowired
 		private CertificatesRepository certificatesRepository;
 	
 		private X500Name certIssuer;
 		private X500Name certSubject;
+		@Column(length = 1000)
 		private BigInteger serialNum;
 		private Date startDate;
 		private Date endDate;
 		private PublicKey  pubKey;
 		private PrivateKey privKey;
+		private PublicKey  pubKey2;
+		private PrivateKey privKey2;
 		private String signatureAlgorithm;
 		private String bcProvider;
+		private boolean isRoot;
 		
 		public CertificateBuilder() {
 			
@@ -51,7 +59,7 @@ import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 		}
 		
 		public CertificateBuilder(X500Name certIssuer, X500Name certSubject, BigInteger serialNum, Date startDate,
-				Date endDate, PublicKey pubKey, PrivateKey privKey, String signatureAlgorithm, String bcProvider) {
+				Date endDate, PublicKey pubKey, PrivateKey privKey,PublicKey pubKey2, PrivateKey privKey2, String signatureAlgorithm, String bcProvider, CertificatesRepository certificatesRepository, boolean isRoot) {
 			super();
 			this.certIssuer = certIssuer;
 			this.certSubject = certSubject;
@@ -60,8 +68,14 @@ import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 			this.endDate = endDate;
 			this.pubKey = pubKey;
 			this.privKey = privKey;
+			this.pubKey2 = pubKey;
+			this.privKey2 = privKey;
 			this.signatureAlgorithm = signatureAlgorithm;
 			this.bcProvider = bcProvider;
+			this.certificatesRepository = certificatesRepository;
+			this.isRoot = isRoot;
+			
+
 		}
 		
 
@@ -113,8 +127,63 @@ import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 		public void setPubKey(PublicKey pubKey) {
 			this.pubKey = pubKey;
 		}
+		
+		
 		 
-		public X509Certificate X500Certificate() throws CertIOException, OperatorCreationException, NoSuchAlgorithmException, CertificateException {
+		public boolean isRoot() {
+			return isRoot;
+		}
+
+		public void setRoot(boolean isRoot) {
+			this.isRoot = isRoot;
+		}
+		
+		
+
+		public PublicKey getPubKey2() {
+			return pubKey2;
+		}
+
+		public void setPubKey2(PublicKey pubKey2) {
+			this.pubKey2 = pubKey2;
+		}
+
+		public PrivateKey getPrivKey2() {
+			return privKey2;
+		}
+
+		public void setPrivKey2(PrivateKey privKey2) {
+			this.privKey2 = privKey2;
+		}
+
+		public X509Certificate X500Certificate() throws CertIOException, OperatorCreationException, NoSuchAlgorithmException, CertificateException, InvalidKeyException, NoSuchProviderException, SignatureException {
+			
+			if(isRoot == false) {
+	        	 PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(certIssuer, pubKey2);
+	             JcaContentSignerBuilder csrBuilder = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(bcProvider);
+	     
+	             // Sign the new KeyPair with the root cert Private Key
+	              ContentSigner csrContentSigner = csrBuilder.build(privKey);
+	              PKCS10CertificationRequest csr = p10Builder.build(csrContentSigner);
+	              
+	              X509v3CertificateBuilder issuedCertBuilder = new X509v3CertificateBuilder(certIssuer, serialNum, startDate, endDate, csr.getSubject(), csr.getSubjectPublicKeyInfo());
+	              
+	  
+	                       X509CertificateHolder issuedCertHolder = issuedCertBuilder.build(csrContentSigner);
+	                       X509Certificate issuedCert  = new JcaX509CertificateConverter().setProvider(bcProvider).getCertificate(issuedCertHolder);
+	              
+	                      // Verify the issued cert signature against the root (issuer) cert
+	                       issuedCert.verify(pubKey, bcProvider);
+	                       
+	                       
+	       				Certificates certificates = new Certificates(2, serialNum.longValue(), certIssuer.toString(),certSubject.toString());
+	    				
+	    				this.certificatesRepository.saveAll(Arrays.asList(certificates));
+	                       
+	                       return issuedCert;
+	              
+	                      
+	        }
 			
 			    ContentSigner rootCertContentSigner = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(bcProvider).build(privKey); //criando a assinatura 
 		        X509v3CertificateBuilder rootCertBuilder = new JcaX509v3CertificateBuilder(certIssuer, serialNum, startDate, endDate, certSubject, pubKey);// cria o certificado com as caracteristicas
@@ -129,21 +198,19 @@ import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 		        
 		        // Create a cert holder and export to X509Certificate
 		        X509CertificateHolder rootCertHolder = rootCertBuilder.build(rootCertContentSigner); //recebe o criador de certificado com as caracteristicas e chama a variavel que é responsavel para assinar
-		        X509Certificate rootCert = new JcaX509CertificateConverter().setProvider(bcProvider).getCertificate(rootCertHolder); // recebe o certificado
+		        X509Certificate certificate = new JcaX509CertificateConverter().setProvider(bcProvider).getCertificate(rootCertHolder); // recebe o certificado
+		        
+   				Certificates certificates = new Certificates(2, serialNum.longValue(), certIssuer.toString(),certSubject.toString());
+				
+				this.certificatesRepository.saveAll(Arrays.asList(certificates));
+		        
+		        return certificate;
+		        
 		        
 
 
-		        return rootCert;
-		}
-		
-		@Override
-		public void run(String... args) throws Exception {
-			
-			
-			Certificates certificates = new Certificates(2, serialNum, certIssuer.toString(),certSubject.toString());
-			
-			certificatesRepository.saveAll(Arrays.asList(certificates));
-	
+
+		       
 		}
 		
 		

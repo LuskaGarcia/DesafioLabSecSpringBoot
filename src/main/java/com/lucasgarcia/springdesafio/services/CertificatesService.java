@@ -17,7 +17,7 @@ public class CertificatesService {
 	private CertificatesRepository repo;
 	
 	public Certificates find(Integer id) throws ObjectNotFoundException { 
-		 Optional<Certificates> obj = repo.findById(id); 
+		 Optional<Certificates> obj = repo.findById(id); //retorna o objeto completo
 		return obj.orElseThrow(() -> new ObjectNotFoundException( 
 		 "Objeto não encontrado! Id: " + id + ", Tipo: " + Certificates.class.getName())); 
 		}

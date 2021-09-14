@@ -1,7 +1,5 @@
 package com.lucasgarcia.springdesafio;
 
-
-import java.math.BigInteger;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +16,7 @@ import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 
 @SpringBootApplication
 public class DesafioLabSeCspringApplication implements CommandLineRunner {
+	
 
 		@Autowired
 		private  AuthorityRepository authorityRepository;
@@ -34,11 +33,19 @@ public class DesafioLabSeCspringApplication implements CommandLineRunner {
 		@Override
 		public void run(String... args) throws Exception {
 			
-			Authority rootAuthority = AuthorityBuilder.build(true, "CN=root-cert");			
+			
+		   //CertificateBuilder builder = new CertificateBuilder(certificatesRepository);
+			
+			
+			Authority rootAuthority = AuthorityBuilder.build(true, "CN=root-cert",null,certificatesRepository);			
 			authorityRepository.saveAll(Arrays.asList(rootAuthority));		
 			
-			Certificates certificates = new Certificates(1, BigInteger.valueOf(10), "Abcd", "ABCDD");
+			Authority intermediateAuthority = AuthorityBuilder.build(false, "CN=subject-cert", rootAuthority, certificatesRepository);			
+			authorityRepository.saveAll(Arrays.asList(intermediateAuthority));	
+			
+			Certificates certificates = new Certificates(1, java.lang.Long.valueOf(10), "Abcd", "ABCDD");
 			certificatesRepository.saveAll(Arrays.asList(certificates));
+			
 	
 		}
 

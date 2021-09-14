@@ -25,16 +25,21 @@ public class Authority implements Serializable{
 	private String authorityCert; //fazer em formato de lista depois
 	private String issuerCert; //fazer em formato de lista depois transformar em uma string 
 	private boolean isRootAuthority;
+	
+	public Authority () {
+		
+		
+	}
 
 	public Authority(Integer id, String name, String authorityCert, String issuerCert) {
 		this.id = id;
 		this.name = name;
 		this.authorityCert = authorityCert;
 		this.issuerCert = issuerCert;
-		this.isRootAuthority = false; 	
+		this.isRootAuthority = false;
 
 	}
-
+	
 	public Authority(Integer id, String name, String authorityCert, String issuerCert, boolean rootAuthority) {
 		this.id = id;
 		this.name = name;

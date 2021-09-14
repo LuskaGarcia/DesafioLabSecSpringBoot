@@ -3,13 +3,15 @@ package com.lucasgarcia.springdesafio.domain;
 
 
 	import java.io.Serializable;
-	import java.math.BigInteger;
-import java.util.Objects;
+	
+	import java.util.Objects;
 
-import javax.persistence.Entity;
+	import javax.persistence.Column;
+	import javax.persistence.Entity;
 	import javax.persistence.GeneratedValue;
 	import javax.persistence.GenerationType;
 	import javax.persistence.Id;
+
 
 	@Entity
 	public class Certificates implements Serializable{ 
@@ -19,7 +21,8 @@ import javax.persistence.Entity;
 		@Id
 		@GeneratedValue(strategy = GenerationType.IDENTITY)
 		private Integer id;
-		private BigInteger serialNumber;
+		@Column(length = 1000)
+		private java.lang.Long serialNumber;
 		private String emissor;
 		private String receptor;
 
@@ -31,12 +34,14 @@ import javax.persistence.Entity;
 		
 		//apenas armazenamento de dados
 
-		public Certificates(Integer id, BigInteger serialNumber, String emissor, String receptor) {
+		public Certificates(Integer id, java.lang.Long serialNumber, String emissor, String receptor) {
 			super();
 			this.id = id;
 			this.serialNumber = serialNumber;
 			this.emissor = emissor;
 			this.receptor = receptor;
+			//armazenar APENAS certificado
+			// pra passar pra outra tabela, apenas o referencial id
 
 		}
 
@@ -48,11 +53,10 @@ import javax.persistence.Entity;
 			this.id = id;
 		}
 
-		public BigInteger getSerialNumber() {
+		public java.lang.Long getSerialNumber() {
 			return serialNumber;
 		}
-
-		public void setSerialNumber(BigInteger serialNumber) {
+		public void setSerialNumber(java.lang.Long serialNumber) {
 			this.serialNumber = serialNumber;
 		}
 

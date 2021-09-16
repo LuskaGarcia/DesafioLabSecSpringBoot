@@ -1,7 +1,5 @@
 package com.lucasgarcia.springdesafio.domain;
 
-
-
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -12,31 +10,25 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
-
-
-
-
-
 @Entity
-public class Authority implements Serializable{
+public class Authority implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	@Column(length = 1000)
 	private String name;
-	private String issuerCert; 
+	private String issuerCert;
 	private boolean isRootAuthority;
-	
+
 	@OneToOne
-	@JoinColumn(name="certificado_id")
+	@JoinColumn(name = "certificado_id")
 	private Certificate certificado;
-	
-	public Authority () {
-		
-		
+
+	public Authority() {
+
 	}
 
 	public Authority(Integer id, String name, String issuerCert) {
@@ -45,8 +37,8 @@ public class Authority implements Serializable{
 		this.issuerCert = issuerCert;
 		this.isRootAuthority = false;
 	}
-	
-	public Authority(Integer id, String name,String issuerCert, boolean rootAuthority) {
+
+	public Authority(Integer id, String name, String issuerCert, boolean rootAuthority) {
 		this.id = id;
 		this.name = name;
 		this.issuerCert = issuerCert;
@@ -60,14 +52,15 @@ public class Authority implements Serializable{
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	
-	
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getIssuerCert() {
 		return issuerCert;
 	}
@@ -92,7 +85,4 @@ public class Authority implements Serializable{
 		this.certificado = certificado;
 	}
 
-	
-	
-	
 }

@@ -12,75 +12,67 @@ import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+@Entity
+public class Certificate implements Serializable {
+	private static final long serialVersionUID = 1L;
 
-	@Entity
-	public class Certificate implements Serializable{ 
-		private static final long serialVersionUID = 1L;
-		
-		
-		@Id
-		@GeneratedValue(strategy = GenerationType.IDENTITY)
-		private Integer id;
-		@Column(length = 1000)
-		private String certificate;
-		
-		@JsonIgnore
-		@OneToOne(mappedBy="certificado")
-		private Authority autoridade;
-		
-		public Certificate() {
-			
-			
-		}
-		
-		//apenas armazenamento de dados
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	@Column(length = 1000)
+	private String certificate;
 
-		public Certificate(Integer id, String certificate) {
-			super();
-			this.id = id;
-			this.certificate = certificate;
+	@JsonIgnore
+	@OneToOne(mappedBy = "certificado")
+	private Authority autoridade;
 
-			//armazenar APENAS certificado
-			// pra passar pra outra tabela, apenas o referencial id
+	public Certificate() {
 
-		}
+	}
 
-		public Integer getId() {
-			return id;
-		}
+	// apenas armazenamento de dados
 
-		public void setId(Integer id) {
-			this.id = id;
-		}	
-		
-		
-		
-		public String getCertificate() {
-			return certificate;
-		}
+	public Certificate(Integer id, String certificate) {
+		super();
+		this.id = id;
+		this.certificate = certificate;
 
-		public void setCertificate(String certificate) {
-			this.certificate = certificate;
-		}
-		
-		@Override
-		public int hashCode() {
-			return Objects.hash(id);
-		}
+		// armazenar APENAS certificado
+		// pra passar pra outra tabela, apenas o referencial id
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Certificate other = (Certificate) obj;
-			return Objects.equals(id, other.id);
-		}
+	}
 
+	public Integer getId() {
+		return id;
+	}
 
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
+	public String getCertificate() {
+		return certificate;
+	}
+
+	public void setCertificate(String certificate) {
+		this.certificate = certificate;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Certificate other = (Certificate) obj;
+		return Objects.equals(id, other.id);
+	}
 
 }

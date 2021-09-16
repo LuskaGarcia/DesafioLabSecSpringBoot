@@ -17,7 +17,6 @@ import com.lucasgarcia.springdesafio.domain.repositories.KeysRepository;
 @SpringBootApplication
 public class DesafioLabSeCspringApplication implements CommandLineRunner {
 	
-
 		@Autowired
 		private  AuthorityRepository authorityRepository;
 		
@@ -39,8 +38,7 @@ public class DesafioLabSeCspringApplication implements CommandLineRunner {
 			
 		   //CertificateBuilder builder = new CertificateBuilder(certificatesRepository);
 			
-			
-			Authority rootAuthority = AuthorityBuilder.build(true, "CN=root-cert",null,certificatesRepository, keysRepository);			
+			Authority rootAuthority = AuthorityBuilder.build(true, "CN=root-cert",null,certificatesRepository, keysRepository);	
 			authorityRepository.saveAll(Arrays.asList(rootAuthority));		
 			
 			Authority intermediateAuthority = AuthorityBuilder.build(false, "CN=subject-cert", rootAuthority, certificatesRepository, keysRepository);			

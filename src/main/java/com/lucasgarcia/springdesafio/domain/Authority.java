@@ -9,6 +9,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+
+
+
 
 
 
@@ -25,6 +30,10 @@ public class Authority implements Serializable{
 	private String issuerCert; 
 	private boolean isRootAuthority;
 	
+	@OneToOne
+	@JoinColumn(name="certificado_id")
+	private Certificate certificado;
+	
 	public Authority () {
 		
 		
@@ -35,7 +44,6 @@ public class Authority implements Serializable{
 		this.name = name;
 		this.issuerCert = issuerCert;
 		this.isRootAuthority = false;
-
 	}
 	
 	public Authority(Integer id, String name,String issuerCert, boolean rootAuthority) {
@@ -75,7 +83,16 @@ public class Authority implements Serializable{
 	public void setRootAuthority(boolean isRootAuthority) {
 		this.isRootAuthority = isRootAuthority;
 	}
-	
 
+	public Certificate getCertificado() {
+		return certificado;
+	}
+
+	public void setCertificado(Certificate certificado) {
+		this.certificado = certificado;
+	}
+
+	
+	
 	
 }

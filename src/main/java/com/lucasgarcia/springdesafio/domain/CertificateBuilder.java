@@ -53,6 +53,7 @@ import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 		private String signatureAlgorithm;
 		private String bcProvider;
 		private boolean isRoot;
+		private Certificate certificates;
 		
 		public CertificateBuilder() {
 			
@@ -77,6 +78,65 @@ import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 			this.isRoot = isRoot;
 			
 
+		}
+		
+public X509Certificate X500Certificate() throws CertIOException, OperatorCreationException, NoSuchAlgorithmException, CertificateException, InvalidKeyException, NoSuchProviderException, SignatureException {
+			
+			Authority autoridade = new Authority();
+			
+			if(isRoot == false) {
+				PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(certIssuer, pubKey2);
+	             JcaContentSignerBuilder csrBuilder = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(bcProvider);
+	             
+	             
+	     
+	             // Sign the new KeyPair with the root cert Private Key
+	              ContentSigner csrContentSigner = csrBuilder.build(privKey);
+	              PKCS10CertificationRequest csr = p10Builder.build(csrContentSigner);
+	              
+	              X509v3CertificateBuilder issuedCertBuilder = new X509v3CertificateBuilder(certIssuer, serialNum, startDate, endDate, csr.getSubject(), csr.getSubjectPublicKeyInfo());
+	              
+	  
+	                       X509CertificateHolder issuedCertHolder = issuedCertBuilder.build(csrContentSigner);
+	                       X509Certificate issuedCert  = new JcaX509CertificateConverter().setProvider(bcProvider).getCertificate(issuedCertHolder);
+	                       String issuedCertificatePem = Base64.getEncoder().encodeToString(issuedCert.getEncoded());
+	                      // Verify the issued cert signature against the root (issuer) cert
+	                       issuedCert.verify(pubKey, bcProvider);
+	                       
+	                       
+	       				 certificates = new Certificate(null, issuedCertificatePem);
+	       				 autoridade.setCertificado(certificates);
+	    				
+	    				certificatesRepository.saveAll(Arrays.asList(certificates));
+	                       
+	                       return issuedCert;
+	                      
+	        }
+			
+			ContentSigner rootCertContentSigner = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(bcProvider).build(privKey); //criando a assinatura 
+	        X509v3CertificateBuilder rootCertBuilder = new JcaX509v3CertificateBuilder(certIssuer, serialNum, startDate, endDate, certSubject, pubKey);// cria o certificado com as caracteristicas
+	        
+	        // Add Extensions
+	        // A BasicConstraint to mark root certificate as CA certificate
+	        JcaX509ExtensionUtils rootCertExtUtils = new JcaX509ExtensionUtils(); // Crie uma classe de utilitário pré-configurada com uma calculadora de resumo SHA-1 com base na implementação padrão
+	        rootCertBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true)); //marca a extensão com critica
+	        rootCertBuilder.addExtension(Extension.subjectKeyIdentifier, false, rootCertExtUtils.createSubjectKeyIdentifier(pubKey));
+
+
+	        
+	        // Create a cert holder and export to X509Certificate
+	        X509CertificateHolder rootCertHolder = rootCertBuilder.build(rootCertContentSigner); //recebe o criador de certificado com as caracteristicas e chama a variavel que é responsavel para assinar
+	        X509Certificate rootCertificate = new JcaX509CertificateConverter().setProvider(bcProvider).getCertificate(rootCertHolder); // recebe o certificado
+	        String rootCertificatePem = Base64.getEncoder().encodeToString(rootCertificate.getEncoded());
+	        
+			certificates = new Certificate(null,rootCertificatePem);
+			
+			autoridade.setCertificado(certificates);
+			
+			certificatesRepository.saveAll(Arrays.asList(certificates));
+	        
+	        return rootCertificate;
+		       
 		}
 		
 
@@ -157,63 +217,15 @@ import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 			this.privKey2 = privKey2;
 		}
 
-		public X509Certificate X500Certificate() throws CertIOException, OperatorCreationException, NoSuchAlgorithmException, CertificateException, InvalidKeyException, NoSuchProviderException, SignatureException {
-			
-			if(isRoot == false) {
-	        	 PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(certIssuer, pubKey2);
-	             JcaContentSignerBuilder csrBuilder = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(bcProvider);
-	     
-	             // Sign the new KeyPair with the root cert Private Key
-	              ContentSigner csrContentSigner = csrBuilder.build(privKey);
-	              PKCS10CertificationRequest csr = p10Builder.build(csrContentSigner);
-	              
-	              X509v3CertificateBuilder issuedCertBuilder = new X509v3CertificateBuilder(certIssuer, serialNum, startDate, endDate, csr.getSubject(), csr.getSubjectPublicKeyInfo());
-	              
-	  
-	                       X509CertificateHolder issuedCertHolder = issuedCertBuilder.build(csrContentSigner);
-	                       X509Certificate issuedCert  = new JcaX509CertificateConverter().setProvider(bcProvider).getCertificate(issuedCertHolder);
-	                       String issuedCertificatePem = Base64.getEncoder().encodeToString(issuedCert.getEncoded());
-	                      // Verify the issued cert signature against the root (issuer) cert
-	                       issuedCert.verify(pubKey, bcProvider);
-	                       
-	                       
-	       				Certificate certificates = new Certificate(1, issuedCertificatePem);
-	    				
-	    				this.certificatesRepository.saveAll(Arrays.asList(certificates));
-	                       
-	                       return issuedCert;
-	              
-	                      
-	        }
-			
-			    ContentSigner rootCertContentSigner = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(bcProvider).build(privKey); //criando a assinatura 
-		        X509v3CertificateBuilder rootCertBuilder = new JcaX509v3CertificateBuilder(certIssuer, serialNum, startDate, endDate, certSubject, pubKey);// cria o certificado com as caracteristicas
-		        
-		        // Add Extensions
-		        // A BasicConstraint to mark root certificate as CA certificate
-		        JcaX509ExtensionUtils rootCertExtUtils = new JcaX509ExtensionUtils(); // Crie uma classe de utilitário pré-configurada com uma calculadora de resumo SHA-1 com base na implementação padrão
-		        rootCertBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true)); //marca a extensão com critica
-		        rootCertBuilder.addExtension(Extension.subjectKeyIdentifier, false, rootCertExtUtils.createSubjectKeyIdentifier(pubKey));
+		public Certificate getCertificates() {
+			return certificates;
+		}
 
-
-		        
-		        // Create a cert holder and export to X509Certificate
-		        X509CertificateHolder rootCertHolder = rootCertBuilder.build(rootCertContentSigner); //recebe o criador de certificado com as caracteristicas e chama a variavel que é responsavel para assinar
-		        X509Certificate rootCertificate = new JcaX509CertificateConverter().setProvider(bcProvider).getCertificate(rootCertHolder); // recebe o certificado
-		        String rootCertificatePem = Base64.getEncoder().encodeToString(rootCertificate.getEncoded());
-		        
-   				Certificate certificates = new Certificate(2,rootCertificatePem);
-				
-				this.certificatesRepository.saveAll(Arrays.asList(certificates));
-		        
-		        return rootCertificate;
-		        
-		        
-
-
-
-		       
+		public void setCertificates(Certificate certificates) {
+			this.certificates = certificates;
 		}
 		
+		
+
 		
 	}

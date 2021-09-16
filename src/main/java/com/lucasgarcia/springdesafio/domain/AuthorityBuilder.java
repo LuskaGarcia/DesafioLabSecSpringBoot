@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.security.cert.Certificate;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,7 +38,6 @@ public class AuthorityBuilder implements Serializable{
         
         X500Name rootCertIssuer,rootCertSubject, issuedCertSubject;
         BigInteger rootSerialNum,issuedSerialNum;
-        String issuerPem,issuedPem;
         
      	 Calendar calendar = Calendar.getInstance();
          calendar.add(Calendar.DATE, -1);
@@ -50,38 +48,36 @@ public class AuthorityBuilder implements Serializable{
         
         if(issuer == null) {
 
-             // First step is to create a root certificate
-             // First Generate a KeyPair,
-             // then a random serial number
-             // then generate a certificate using the KeyPair
-             rootSerialNum = new BigInteger(Long.toString(new SecureRandom().nextLong())); //armazena o serialnumber que é um grande inteiro
-             
-             // Issued By and Issued To same for root certificate
-             rootCertIssuer = new X500Name(name); //o x500name é uma classe entidade que tem suporte aos atributos do x500
-             rootCertSubject = rootCertIssuer; // aqui define que é um AC auto assinado, pois diz que o issuer (emissor) é o mesmo que o subject (quem quer o certificado)
-             CertificateBuilder rootCert = new CertificateBuilder(rootCertIssuer, rootCertSubject, rootSerialNum, startDate, endDate, chaves.getPublicKey(), chaves.getPrivateKey(),null,null, SIGNATURE_ALGORITHM, BC_PROVIDER,certificatesRepository,isRoot);
-             issuerPem = Base64.getEncoder().encodeToString(rootCert.X500Certificate().getEncoded());
-             
-            // exportKeyPairToKeystoreFile(chaves.privateKey, rootCert, "root-cert", "root-cert.pfx", "PKCS12", "pass");
-             writeCertToFileBase64Encoded(rootCert, "root-cert.cer");
-             return new Authority(null,rootCertSubject.toString(),rootCertIssuer.toString(),isRoot);
+        	 // First step is to create a root certificate
+            // First Generate a KeyPair,
+            // then a random serial number
+            // then generate a certificate using the KeyPair
+            rootSerialNum = new BigInteger(Long.toString(new SecureRandom().nextLong())); //armazena o serialnumber que é um grande inteiro
+            
+            // Issued By and Issued To same for root certificate
+            rootCertIssuer = new X500Name(name); //o x500name é uma classe entidade que tem suporte aos atributos do x500
+            rootCertSubject = rootCertIssuer; // aqui define que é um AC auto assinado, pois diz que o issuer (emissor) é o mesmo que o subject (quem quer o certificado)
+            CertificateBuilder rootCert = new CertificateBuilder(rootCertIssuer, rootCertSubject, rootSerialNum, startDate, endDate, chaves.getPublicKey(), chaves.getPrivateKey(),null,null, SIGNATURE_ALGORITHM, BC_PROVIDER,certificatesRepository,isRoot);
+            
+           // exportKeyPairToKeystoreFile(chaves.privateKey, rootCert, "root-cert", "root-cert.pfx", "PKCS12", "pass");
+            writeCertToFileBase64Encoded(rootCert, "root-cert.cer");
+            return new Authority(null,rootCertSubject.toString(),rootCertIssuer.toString(),isRoot);
         }else {
 
-         // First step is to create a root certificate
-         // First Generate a KeyPair,
-         // then a random serial number
-         // then generate a certificate using the KeyPair
-         issuedSerialNum = new BigInteger(Long.toString(new SecureRandom().nextLong())); //armazena o serialnumber que é um grande inteiro
-         
-         // Issued By and Issued To same for root certificate
-         issuedCertSubject = new X500Name(name); //o x500name é uma classe entidade que tem suporte aos atributos do x500
-         CertificateBuilder issuedCert = new CertificateBuilder(issuedCertSubject,new X500Name(issuer.getName()) , issuedSerialNum, startDate, endDate, chaves.getPublicKey(), chaves.getPrivateKey(), chaves.getPublicKey2(), chaves.getPrivateKey2(), SIGNATURE_ALGORITHM, BC_PROVIDER, certificatesRepository, isRoot);
-         issuedPem = Base64.getEncoder().encodeToString(issuedCert.X500Certificate().getEncoded());
-         
-        // exportKeyPairToKeystoreFile(chaves.privateKey, rootCert, "root-cert", "root-cert.pfx", "PKCS12", "pass");
-         writeCertToFileBase64Encoded(issuedCert, "issued-cert.cer");
-        	
-         return new Authority(null,issuedCertSubject.toString(),issuer.getName().toString(), isRoot);
+        	 // First step is to create a root certificate
+            // First Generate a KeyPair,
+            // then a random serial number
+            // then generate a certificate using the KeyPair
+            issuedSerialNum = new BigInteger(Long.toString(new SecureRandom().nextLong())); //armazena o serialnumber que é um grande inteiro
+            
+            // Issued By and Issued To same for root certificate
+            issuedCertSubject = new X500Name(name); //o x500name é uma classe entidade que tem suporte aos atributos do x500
+            CertificateBuilder issuedCert = new CertificateBuilder(issuedCertSubject,new X500Name(issuer.getName()) , issuedSerialNum, startDate, endDate, chaves.getPublicKey(), chaves.getPrivateKey(), chaves.getPublicKey2(), chaves.getPrivateKey2(), SIGNATURE_ALGORITHM, BC_PROVIDER, certificatesRepository, isRoot);
+            
+           // exportKeyPairToKeystoreFile(chaves.privateKey, rootCert, "root-cert", "root-cert.pfx", "PKCS12", "pass");
+            writeCertToFileBase64Encoded(issuedCert, "issued-cert.cer");
+           	
+            return new Authority(null,issuedCertSubject.toString(),issuer.getName().toString(), isRoot);
         }
         
        
@@ -107,6 +103,8 @@ public class AuthorityBuilder implements Serializable{
         certificateOut.close();
 		return null;
     }
+	
+
 }
 
 

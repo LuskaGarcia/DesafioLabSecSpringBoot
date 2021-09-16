@@ -1,8 +1,6 @@
 package com.lucasgarcia.springdesafio.domain;
 
-
-
-	import java.io.Serializable;
+import java.io.Serializable;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -10,6 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 	@Entity
@@ -22,8 +23,10 @@ import javax.persistence.Id;
 		private Integer id;
 		@Column(length = 1000)
 		private String certificate;
-
-
+		
+		@JsonIgnore
+		@OneToOne(mappedBy="certificado")
+		private Authority autoridade;
 		
 		public Certificate() {
 			
@@ -42,7 +45,7 @@ import javax.persistence.Id;
 
 		}
 
-		public int getId() {
+		public Integer getId() {
 			return id;
 		}
 
@@ -59,7 +62,7 @@ import javax.persistence.Id;
 		public void setCertificate(String certificate) {
 			this.certificate = certificate;
 		}
-
+		
 		@Override
 		public int hashCode() {
 			return Objects.hash(id);
@@ -76,6 +79,7 @@ import javax.persistence.Id;
 			Certificate other = (Certificate) obj;
 			return Objects.equals(id, other.id);
 		}
+
 
 
 

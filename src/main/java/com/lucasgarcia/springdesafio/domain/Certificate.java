@@ -19,7 +19,7 @@ public class Certificate implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	@Column(length = 1000)
+	@Column(length = 2000)
 	private String certificate;
 
 	@JsonIgnore

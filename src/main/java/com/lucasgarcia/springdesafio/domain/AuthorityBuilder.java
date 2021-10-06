@@ -97,7 +97,7 @@ public class AuthorityBuilder implements Serializable {
 			autoridade = new Authority(null, issuedCertSubject.toString(), issuer.getName().toString(), isRoot);
 
 			autoridade.setCertificado(issuedCert.build());
-
+			
 			return autoridade;
 		}
 

@@ -14,19 +14,21 @@ import com.lucasgarcia.springdesafio.domain.repositories.CertificatesRepository;
 import com.lucasgarcia.springdesafio.domain.repositories.KeysRepository;
 
 
+
+
 @SpringBootApplication
 public class DesafioLabSeCspringApplication implements CommandLineRunner {
+		
+	@Autowired
+	private  AuthorityRepository authorityRepository;
+
+	@Autowired
+	private  CertificatesRepository certificatesRepository;
+
+	@Autowired
+	private  KeysRepository keysRepository;	
 	
-		@Autowired
-		private  AuthorityRepository authorityRepository;
-		
-		@Autowired
-		private  CertificatesRepository certificatesRepository;
-		
-		@Autowired
-		private  KeysRepository keysRepository;
-		
-		
+	
 		public static void main(String[] args) {
 			SpringApplication.run(DesafioLabSeCspringApplication.class, args);
 			
@@ -36,7 +38,9 @@ public class DesafioLabSeCspringApplication implements CommandLineRunner {
 		public void run(String... args) throws Exception {
 			
 			
-		   //CertificateBuilder builder = new CertificateBuilder(certificatesRepository);
+			//endpoint de configuracao passando os dados da acraiz
+			// setar a ac
+			//apartir disso posso criar ac intermediarias (parametrizado)
 			
 			Authority rootAuthority = AuthorityBuilder.build(true, "CN=root-cert",null,certificatesRepository, keysRepository);	
 			authorityRepository.saveAll(Arrays.asList(rootAuthority));		
@@ -44,8 +48,15 @@ public class DesafioLabSeCspringApplication implements CommandLineRunner {
 			Authority intermediateAuthority = AuthorityBuilder.build(false, "CN=subject-cert", rootAuthority, certificatesRepository, keysRepository);			
 			authorityRepository.saveAll(Arrays.asList(intermediateAuthority));	
 			
-	
+			Authority authority2 = AuthorityBuilder.build(true, "CN=seconde-root-cert",null,certificatesRepository, keysRepository);	
+			authorityRepository.saveAll(Arrays.asList(authority2));		
+			
+			Authority intermediateAuthorityTwo = AuthorityBuilder.build(false, "CN=subject-cert-second", rootAuthority, certificatesRepository, keysRepository);			
+			authorityRepository.saveAll(Arrays.asList(intermediateAuthorityTwo));	
+			
+			Authority intermediateAuthorityThree = AuthorityBuilder.build(false, "CN=subject-cert-three", authority2, certificatesRepository, keysRepository);			
+			authorityRepository.saveAll(Arrays.asList(intermediateAuthorityThree));	
+			
 		}
-
 }
 

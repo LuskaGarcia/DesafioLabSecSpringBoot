@@ -85,4 +85,7 @@ public class Authority implements Serializable {
 		this.certificado = certificado;
 	}
 
+
+
+	
 }
